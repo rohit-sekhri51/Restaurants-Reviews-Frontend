@@ -3,9 +3,11 @@ import React, { FC } from "react";
 
 interface CardProps {
     review: Review;
+    onEdit: () => void;
+//    onDelete: (review: Review) => void;
 }
 
-const ReviewCard: FC<CardProps> = ({ review }) => {
+const ReviewCard: FC<CardProps> = ({ review, onEdit }) => {
     const { title, description, rating, location } = review;
 
     return (
@@ -22,6 +24,13 @@ const ReviewCard: FC<CardProps> = ({ review }) => {
             <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
                 {location}
             </p>
+
+            <button
+                onClick={onEdit}
+                className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm"
+            >
+                Edit
+            </button>
         </div>
     );
 };

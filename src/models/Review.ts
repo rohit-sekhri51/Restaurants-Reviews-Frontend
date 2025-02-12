@@ -5,12 +5,14 @@ export class Review {
     rating: number;
     description: string;
     location: string;
+    variant: number;
 
     constructor(title: string, rating: number, description: string,location: string) {
         this.title = title;
         this.rating = rating;
         this.description = description;
         this.location = location;
+        this.variant = 0;
     }
 
     borshInstructionSchema = borsh.struct([
@@ -31,7 +33,7 @@ export class Review {
 
     serialize(): Buffer {
         const buffer = Buffer.alloc(1000);
-        this.borshInstructionSchema.encode({ ...this, variant: 1 }, buffer);
+        this.borshInstructionSchema.encode({ ...this, variant: this.variant }, buffer);
         return buffer.slice(0, this.borshInstructionSchema.getSpan(buffer));
     }
 

@@ -9,7 +9,10 @@ interface FormProps {
     setDescription: (value: string) => void;
     setRating: (value: number) => void;
     setLocation: (value: string) => void;
-    handleSubmit: () => void;
+    handleSubmit?: () => void;
+    isUpdating?: boolean;
+    onCancel?: () => void;
+    onUpdate?: () => void;
 }
 const ReviewForm: FC<FormProps> = ({
     title,
@@ -20,20 +23,23 @@ const ReviewForm: FC<FormProps> = ({
     setDescription,
     setRating,
     setLocation,
-    handleSubmit,
+    // handleSubmit,
+    // isUpdating,
+    // onCancel,
+    // onUpdate,
 }) => {
-    const formSubmit = (e: any) => {
+    const formSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (rating < 0 || rating > 10) {
             alert("Rating must be between 0 and 10.");
             return;
         }
-        handleSubmit();
+        //handleSubmit();
     };
     return (
         <form
             className="shadow-md rounded px-8 pt-6 pb-8 mb-4"
-            onSubmit={(e) => formSubmit(e)}
+            //onSubmit={(e) => formSubmit(e)}
         >
             <div className="w-full max-w-xs">
                 <div className="mb-4">
@@ -94,11 +100,29 @@ const ReviewForm: FC<FormProps> = ({
                     />
                 </div>
 
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         Submit
                     </button>
-                </div>
+                </div> */}
+
+                {/* <div className="flex items-center justify-between">
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Submit
+                    </button>
+                    <button onClick={onUpdate} className="bg-blue-300 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Update
+                    </button>
+                {isUpdating && (
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-4"
+                    >
+                        Cancel
+                    </button>
+                )}
+            </div> */}
             </div>
         </form>
     );

@@ -10,6 +10,7 @@ import ReviewForm from "@/components/Form";
 const REVIEW_PROGRAM_ID = "J7JUrpGFMTomU98Y777X9dCqZDGHfnd73N9Gn6PsdViX";
 
 export default function Home() {
+
     const connection = new web3.Connection(web3.clusterApiUrl("devnet"));
     const { publicKey, sendTransaction } = useWallet();
     const [txid, setTxid] = useState("");
@@ -21,6 +22,10 @@ export default function Home() {
     const [description, setDescription] = useState("");
     const [location, setLocation] = useState("");
 
+    // Add state to track if we're updating
+    // const [isUpdating, setIsUpdating] = useState(true);
+    const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+
     useEffect(() => {
         const fetchAccounts = async () => {
             await fetchReviews(REVIEW_PROGRAM_ID, connection).then(setReviews);
@@ -30,12 +35,28 @@ export default function Home() {
 
     const handleSubmit = () => {
         const review = new Review(title, rating, description, location);
+        // Set variant based on whether we're updating
+        //review.variant = isUpdating ? 1 : 0;
+        review.variant = 0;
         handleTransactionSubmit(review);
+    };
+
+    const handleUpdate = () => {
+        if (selectedReview) {
+            const review = new Review(title, rating, description, location);
+            review.variant = 1; // Update variant
+            handleTransactionSubmit(review);
+        }
     };
 
     const handleTransactionSubmit = async (review: Review) => {
         if (!publicKey) {
             alert("Please connect your wallet!");
+            return;
+        }
+
+        if (review.rating < 0 || review.rating > 10) {
+            alert("Rating must be between 0 and 10.");
             return;
         }
 
@@ -83,6 +104,26 @@ export default function Home() {
         }
     };
 
+    // Add function to handle edit button click
+    const handleEdit = (review: Review) => {
+        //setIsUpdating(true);
+        setSelectedReview(review);
+        setTitle(review.title);
+        setRating(review.rating);
+        setDescription(review.description);
+        setLocation(review.location);
+    };
+
+    // Add function to cancel update
+    const handleCancel = () => {
+        //setIsUpdating(false);
+        setSelectedReview(null);
+        setTitle("");
+        setRating(0);
+        setDescription("");
+        setLocation("");
+    };
+
     return (
         <main
             className={`flex min-h-screen flex-col items-center justify-between p-24 `}
@@ -101,8 +142,39 @@ export default function Home() {
                     setDescription={setDescription}
                     setRating={setRating}
                     setLocation={setLocation}
-                    handleSubmit={handleSubmit}
+                    // handleSubmit={handleSubmit}
+                    // isUpdating={isUpdating}
+                    // onCancel={handleCancel}
+                    // onUpdate={handleUpdate}
                 />
+
+                <div className="flex gap-4 mt-4">
+                    <button
+                        onClick={handleSubmit}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    >
+                        Submit New Review
+                    </button>
+                    <button
+                        onClick={handleUpdate}
+                        disabled={!selectedReview}
+                        className={`${
+                            selectedReview 
+                                ? "bg-green-500 hover:bg-green-700" 
+                                : "bg-gray-400"
+                        } text-white font-bold py-2 px-4 rounded`}
+                    >
+                        Update Review
+                    </button>
+                    {selectedReview && (
+                        <button
+                            onClick={handleCancel}
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </div>
 
             {txid && <div>{txid}</div>}
@@ -111,7 +183,8 @@ export default function Home() {
                 {reviews &&
                     reviews.map((review) => {
                         return (
-                            <ReviewCard key={review.title} review={review} />
+                            <ReviewCard key={review.title} review={review} 
+                            onEdit={() => handleEdit(review)} />
                         );
                     })}
             </div>
